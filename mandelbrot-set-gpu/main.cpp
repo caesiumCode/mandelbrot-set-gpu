@@ -9,7 +9,7 @@
 
 int main(int argc, const char * argv[]) {
     
-    Program program;
+    Program program(1500, 1100);
     
     program.run();
     

@@ -1,18 +1,17 @@
 uniform vec2 resolution;
 uniform vec3 zoom;
+uniform float limit;
 
 float isInMandelbrotSet(vec2 c) {
-    const float LIMIT = 100.;
-    
     float n = 0.;
     vec2 z = vec2(0., 0.);
     
-    while (z.x*z.x + z.y*z.y <= 4. && n < LIMIT) {
+    while (z.x*z.x + z.y*z.y <= 4. && n < limit) {
         z = vec2(z.x*z.x - z.y*z.y + c.x, 2.*z.x*z.y + c.y);
         n++;
     }
     
-    return n/LIMIT;
+    return n/limit;
 }
 
 void main( void ) {

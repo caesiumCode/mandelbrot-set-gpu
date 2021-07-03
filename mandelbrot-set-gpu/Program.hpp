@@ -8,6 +8,8 @@
 #ifndef Program_hpp
 #define Program_hpp
 
+#include <iostream>
+#include <cmath>
 #include <SFML/Graphics.hpp>
 
 class Program {
@@ -18,29 +20,37 @@ public:
     
 private:
     // Constants
-    const unsigned WINDOW_WIDTH, WINDOW_HEIGHT;
-    const unsigned TEXTURE_WIDTH, TEXTURE_HEIGHT;
-    const float OFFSET_DELTA = 0.05;
+    const unsigned  WINDOW_WIDTH, WINDOW_HEIGHT;
+    const unsigned  TEXTURE_WIDTH, TEXTURE_HEIGHT;
+    const float     OFFSET_DELTA = 0.01;
     
     // shader variables
     float offset_x, offset_y, scale;
+    float limit;
     
     // SFML variables
-    sf::RenderWindow window;
-    sf::RenderTexture MS_texture;
-    sf::Shader MS_shader;
-    sf::Sprite MS_sprite;
+    sf::Cursor          cursor;
+    sf::RenderWindow    window;
+    sf::RenderTexture   MS_texture;
+    sf::Shader          MS_shader;
+    sf::Sprite          MS_sprite;
     
-    /**
-     Deal with the user inputs
-     
-     \param event input to handle
-     */
-    void handleEvent(const sf::Event& event);
+    // Temporary variables
+    sf::Vector2i mouse_initial_position;
+    bool mouse_flag;
     
-    /**
-     Re-calculate the mandelbrot set texture
-     */
+    
+    
+    
+    // Event related methods
+    void handleEvent(const sf::Event&);
+    
+    void exitEvent(const sf::Event&);
+    void scaleEvent(const sf::Event&);
+    void offsetEvent(const sf::Event&);
+    void limitEvent(const sf::Event&);
+    
+    // update mandelbrot set frame
     void update();
 };
 
