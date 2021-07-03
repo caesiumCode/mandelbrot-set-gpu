@@ -1,9 +1,9 @@
 uniform vec2 resolution;
 
-bool isInMandelbrotSet(vec2 c) {
-    const int LIMIT = 100;
+float isInMandelbrotSet(vec2 c) {
+    const float LIMIT = 100.;
     
-    int n = 0;
+    float n = 0.;
     vec2 z = vec2(0., 0.);
     
     while (z.x*z.x + z.y*z.y <= 4. && n < LIMIT) {
@@ -11,17 +11,13 @@ bool isInMandelbrotSet(vec2 c) {
         n++;
     }
     
-    if (n == LIMIT)
-        return true;
-    else
-        return false;
+    return n/LIMIT;
 }
 
 void main( void ) {
-    vec2 normalized_coord = gl_FragCoord.xy/resolution - vec2(.5, .5);
+    vec2 normalized_coord = gl_FragCoord.xy/resolution.x - vec2(.5, .5*resolution.y/resolution.x);
     
-    if (isInMandelbrotSet(3.*normalized_coord))
-        gl_FragColor = vec4(1, 1, 1, 1);
-    else
-        gl_FragColor = vec4(0, 0, 0, 1);
+    float speed = isInMandelbrotSet(5.*normalized_coord);
+    
+    gl_FragColor = vec4(speed, speed, speed, 1);
 }
