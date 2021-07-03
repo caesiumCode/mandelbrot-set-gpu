@@ -1,4 +1,5 @@
 uniform vec2 resolution;
+uniform vec3 zoom;
 
 float isInMandelbrotSet(vec2 c) {
     const float LIMIT = 100.;
@@ -17,7 +18,7 @@ float isInMandelbrotSet(vec2 c) {
 void main( void ) {
     vec2 normalized_coord = gl_FragCoord.xy/resolution.x - vec2(.5, .5*resolution.y/resolution.x);
     
-    float speed = isInMandelbrotSet(5.*normalized_coord);
+    float speed = isInMandelbrotSet(zoom.xy + zoom.z * normalized_coord);
     
     gl_FragColor = vec4(speed, speed, speed, 1);
 }
