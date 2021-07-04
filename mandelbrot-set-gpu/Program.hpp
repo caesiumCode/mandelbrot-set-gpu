@@ -26,8 +26,11 @@ private:
     const float         OFFSET_DELTA = 0.01;
     
     // shader variables
+    sf::Texture previous_state;
     float offset_x, offset_y, scale;
     int limit;
+    
+    
     
     // SFML variables
     sf::Cursor          cursor;
@@ -37,7 +40,7 @@ private:
     sf::Sprite          MS_sprite;
     
     // Temporary variables
-    sf::Vector2i mouse_initial_position;
+    sf::Vector2i mouse_previous_position;
     bool mouse_flag;
     
     

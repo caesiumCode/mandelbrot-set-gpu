@@ -32,9 +32,13 @@ TEXTURE_HEIGHT((float) WINDOW_HEIGHT/WINDOW_WIDTH*TEXTURE_WIDTH)
     offset_y = 0.;
     scale = 5.;
     limit = 100;
+    previous_state.create(TEXTURE_WIDTH, TEXTURE_HEIGHT);
     MS_shader.setUniform("resolution", sf::Glsl::Vec2(TEXTURE_WIDTH, TEXTURE_HEIGHT));
     MS_shader.setUniform("zoom", sf::Glsl::Vec3(offset_x, offset_y, scale));
     MS_shader.setUniform("limit", limit);
+    MS_shader.setUniform("previous_state", previous_state);
+    MS_shader.setUniform("previous_state_position", sf::Glsl::Vec4(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT));
+    MS_shader.setUniform("previous_state_flag", false);
     
     // Setup sprite
     MS_sprite.setScale((float) WINDOW_WIDTH/TEXTURE_WIDTH, (float) WINDOW_HEIGHT/TEXTURE_HEIGHT);
@@ -90,25 +94,35 @@ void Program::offsetEvent(const sf::Event & event) {
         cursor.loadFromSystem(sf::Cursor::Hand);
         window.setMouseCursor(cursor);
         
-        if (!mouse_flag)
-            mouse_initial_position = sf::Mouse::getPosition();
+        mouse_previous_position = sf::Mouse::getPosition();
+        
         mouse_flag = true;
+        MS_shader.setUniform("previous_state_flag", true);
     }
     
     if (mouse_flag) {
-        sf::Vector2i mouse_offset = sf::Mouse::getPosition() - mouse_initial_position;
+        previous_state.update(MS_texture.getTexture());
+        MS_shader.setUniform("previous_state", previous_state);
+        
+        
+        sf::Vector2i mouse_offset = sf::Mouse::getPosition() - mouse_previous_position;
         float temp_offset_x = (float)mouse_offset.x/WINDOW_WIDTH*scale;
         float temp_offset_y = (float)mouse_offset.y/WINDOW_WIDTH*scale;
         
         MS_shader.setUniform("zoom", sf::Glsl::Vec3(offset_x - temp_offset_x, offset_y + temp_offset_y, scale));
+        MS_shader.setUniform("previous_state_position", sf::Glsl::Vec4(mouse_offset.x, -mouse_offset.y, TEXTURE_WIDTH, TEXTURE_HEIGHT));
+        
+        offset_x -= temp_offset_x;
+        offset_y += temp_offset_y;
         update();
+        mouse_previous_position = sf::Mouse::getPosition();
     }
     
     if (event.type == sf::Event::MouseButtonReleased) {
         cursor.loadFromSystem(sf::Cursor::Arrow);
         window.setMouseCursor(cursor);
         
-        sf::Vector2i mouse_offset = sf::Mouse::getPosition() - mouse_initial_position;
+        sf::Vector2i mouse_offset = sf::Mouse::getPosition() - mouse_previous_position;
         float temp_offset_x = (float)mouse_offset.x/WINDOW_WIDTH*scale;
         float temp_offset_y = (float)mouse_offset.y/WINDOW_WIDTH*scale;
         
@@ -116,6 +130,8 @@ void Program::offsetEvent(const sf::Event & event) {
         offset_y += temp_offset_y;
         
         mouse_flag = false;
+        
+        MS_shader.setUniform("previous_state_flag", false);
     }
 }
 
@@ -149,6 +165,7 @@ void Program::limitEvent(const sf::Event & event) {
 
 
 void Program::update() {
+    MS_texture.clear();
     MS_texture.draw(MS_sprite, &MS_shader);
     MS_texture.display();
     MS_sprite.setTexture(MS_texture.getTexture());
