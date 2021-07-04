@@ -17,7 +17,7 @@ TEXTURE_HEIGHT((float) WINDOW_HEIGHT/WINDOW_WIDTH*TEXTURE_WIDTH)
     cursor.loadFromSystem(sf::Cursor::Arrow);
     
     // Setup window
-    window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Mandelbrot Set with GPU");
+    window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE);
     window.setFramerateLimit(30);
     window.setMouseCursor(cursor);
     
@@ -45,14 +45,14 @@ TEXTURE_HEIGHT((float) WINDOW_HEIGHT/WINDOW_WIDTH*TEXTURE_WIDTH)
     
     // Setup Temporary variables
     mouse_flag = false;
+    window.setTitle(WINDOW_TITLE + " | limit=" + std::to_string((int)limit));
 }
 
 void Program::run() {
     while (window.isOpen()) {
         sf::Event event;
-        while (window.pollEvent(event)) {
+        while (window.pollEvent(event))
             handleEvent(event);
-        }
         
         window.clear();
         
@@ -123,11 +123,15 @@ void Program::limitEvent(const sf::Event & event) {
     if (event.type == sf::Event::KeyPressed) {
         switch (event.key.code) {
             case sf::Keyboard::A:
-                limit *= 1.1;
+                if (limit < 10)
+                    limit++;
+                else
+                    limit *= 1.1;
                 break;
                 
             case sf::Keyboard::Z:
-                limit *= 0.9;
+                if (limit > 0)
+                    limit *= 0.9;
                 break;
                 
             default:
@@ -135,7 +139,7 @@ void Program::limitEvent(const sf::Event & event) {
         }
         limit = round(limit);        
         
-        
+        window.setTitle(WINDOW_TITLE + " | limit=" + std::to_string((int)limit));
         MS_shader.setUniform("limit", limit);
         update();
     }

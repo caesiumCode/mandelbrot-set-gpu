@@ -20,13 +20,14 @@ public:
     
 private:
     // Constants
-    const unsigned  WINDOW_WIDTH, WINDOW_HEIGHT;
-    const unsigned  TEXTURE_WIDTH, TEXTURE_HEIGHT;
-    const float     OFFSET_DELTA = 0.01;
+    const std::string   WINDOW_TITLE = "Mandelbrot Set with GPU";
+    const unsigned      WINDOW_WIDTH, WINDOW_HEIGHT;
+    const unsigned      TEXTURE_WIDTH, TEXTURE_HEIGHT;
+    const float         OFFSET_DELTA = 0.01;
     
     // shader variables
     float offset_x, offset_y, scale;
-    float limit;
+    int limit;
     
     // SFML variables
     sf::Cursor          cursor;
