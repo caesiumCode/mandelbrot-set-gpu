@@ -12,9 +12,11 @@
 #include <cmath>
 #include <SFML/Graphics.hpp>
 
+#include "MandelbrotViewer.hpp"
+
 class Program {
 public:
-    Program(unsigned = 1000, unsigned = 700);
+    Program(unsigned, unsigned);
     
     void run();
     
@@ -22,28 +24,16 @@ private:
     // Constants
     const std::string   WINDOW_TITLE = "Mandelbrot Set with GPU";
     const unsigned      WINDOW_WIDTH, WINDOW_HEIGHT;
-    const unsigned      TEXTURE_WIDTH, TEXTURE_HEIGHT;
-    const float         OFFSET_DELTA = 0.01;
-    
-    // shader variables
-    sf::Texture previous_state;
-    float offset_x, offset_y, scale;
-    int limit;
-    
-    
     
     // SFML variables
     sf::Cursor          cursor;
     sf::RenderWindow    window;
-    sf::RenderTexture   MS_texture;
-    sf::Shader          MS_shader;
-    sf::Sprite          MS_sprite;
     
     // Temporary variables
     sf::Vector2i mouse_previous_position;
     bool mouse_flag;
     
-    
+    MandelbrotViewer mandelbrotViewer;
     
     
     // Event related methods
@@ -53,9 +43,6 @@ private:
     void scaleEvent(const sf::Event&);
     void offsetEvent(const sf::Event&);
     void limitEvent(const sf::Event&);
-    
-    // update mandelbrot set frame
-    void update();
 };
 
 #endif /* Program_hpp */

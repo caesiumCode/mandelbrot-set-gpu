@@ -11,15 +11,24 @@ uniform bool previous_state_flag; // true if we use the previous state, false ot
 int isInMandelbrotSet(vec2 c) {
     // Simple geometry optimization
     // Check if c is in the main cardioid/bulb
-    float p = sqrt((c.x - 0.25)*(c.x - 0.25) + c.y*c.y);
-    if (c.x < p - 2.0*p*p + 0.25 || (c.x + 1.0)*(c.x + 1.0) + c.y*c.y < 0.0625)
+    float d_cx = c.x - 0.25;
+    float cy2 = c.y*c.y;
+    float q = d_cx*d_cx + cy2;
+    if (q*(q + d_cx) <= 0.25*cy2 || (c.x + 1.0)*(c.x + 1.0) + cy2 < 0.0625)
         return limit;
     
     // Escape time algorithm
     int n = 0;
-    vec2 z = vec2(0.0);
-    while (dot(z,z) <= 4.0 && n < limit) {
-        z = vec2(z.x*z.x - z.y*z.y + c.x, 2.0*z.x*z.y + c.y);
+    float x = 0.0, x2 = 0.0;
+    float y = 0.0, y2 = 0.0;
+    while (x2 + y2 <= 4.0 && n < limit) {
+        // Series of arithmetic manipulation that need 3 multiplications
+        // instead of 5 for the naive method
+        y = (x + x) * y + c.y;
+        x = x2 - y2 + c.x;
+        x2 = x * x;
+        y2 = y * y;
+        
         n++;
     }
     
@@ -53,7 +62,6 @@ void main( void ) {
                                   resolution.y - (gl_FragCoord.y-previous_state_position.y));
         
         color = texture2D(previous_state, texture_coord/resolution).xyz;
-        
     }
     // Calculate the color from scratch
     else {
@@ -64,5 +72,6 @@ void main( void ) {
         color = toColor(iter);
     }
     
+    // Output
     gl_FragColor = vec4(color, 1.0);
 }
