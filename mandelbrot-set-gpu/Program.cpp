@@ -46,6 +46,9 @@ void Program::handleEvent(const sf::Event& event) {
     scaleEvent(event);
     offsetEvent(event);
     limitEvent(event);
+    
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Return)
+        mandelbrotViewer.refresh();
 }
 
 void Program::exitEvent(const sf::Event & event) {

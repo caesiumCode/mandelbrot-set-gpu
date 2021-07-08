@@ -22,17 +22,21 @@ public:
     void increase_limit();
     void decrease_limit();
     
+    void refresh();
+    
     void draw(sf::RenderWindow &);
     
 private:
     // Constants
     unsigned WINDOW_WIDTH, WINDOW_HEIGHT;
     unsigned TEXTURE_WIDTH, TEXTURE_HEIGHT;
+    float WINDOW_TO_TEXTURE;
     
     // Optimization parameters
     bool previous_state_flag;
     
     // Computation constrains
+    float buffer_pixel_offset_x, buffer_pixel_offset_y;
     float offset_x, offset_y, scale;
     int limit;
     

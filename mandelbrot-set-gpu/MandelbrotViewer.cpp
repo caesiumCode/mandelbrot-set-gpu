@@ -15,6 +15,8 @@ MandelbrotViewer::MandelbrotViewer() {
     previous_state_flag = false;
     
     // Computation constrains
+    buffer_pixel_offset_x = 0.;
+    buffer_pixel_offset_y = 0.;
     offset_x = 0.;
     offset_y = 0.;
     scale = 5.;
@@ -41,6 +43,8 @@ void MandelbrotViewer::set_rendering_settings(unsigned int w, unsigned int h) {
     TEXTURE_WIDTH = w;
     TEXTURE_HEIGHT = h;
     
+    WINDOW_TO_TEXTURE = (float) TEXTURE_WIDTH/WINDOW_WIDTH;
+    
     // Update Textures
     texture.create(TEXTURE_WIDTH, TEXTURE_HEIGHT);
     previous_state.create(TEXTURE_WIDTH, TEXTURE_HEIGHT);
@@ -63,17 +67,29 @@ void MandelbrotViewer::set_previous_state_optimization(bool flag) {
 }
 
 void MandelbrotViewer::update_offset(int pixel_dx, int pixel_dy) {
-    // Pixel coordinates to complex plan coordinates
-    float temp_offset_x = (float)pixel_dx/WINDOW_WIDTH*scale;
-    float temp_offset_y = (float)pixel_dy/WINDOW_WIDTH*scale;
+    buffer_pixel_offset_x += pixel_dx;
+    buffer_pixel_offset_y += pixel_dy;
+    
+    int texture_pixel_offset_x = (float) buffer_pixel_offset_x * WINDOW_TO_TEXTURE;
+    int texture_pixel_offset_y = (float) buffer_pixel_offset_y * WINDOW_TO_TEXTURE;
     
     // Update offset
-    offset_x -= temp_offset_x;
-    offset_y -= temp_offset_y;
+    if (abs(texture_pixel_offset_x) >= 1) {
+        
+        offset_x -= (float) texture_pixel_offset_x/TEXTURE_WIDTH*scale;
+        buffer_pixel_offset_x -= (float) texture_pixel_offset_x / WINDOW_TO_TEXTURE;
+        
+    } if (abs(texture_pixel_offset_y) >= 1) {
+        
+        offset_y -= (float) texture_pixel_offset_y/TEXTURE_WIDTH*scale;;
+        buffer_pixel_offset_y -= (float) texture_pixel_offset_y / WINDOW_TO_TEXTURE;;
+    }
     
     // Update shader variables
     shader.setUniform("zoom", sf::Glsl::Vec3(offset_x, offset_y, scale));
-    shader.setUniform("previous_state_position", sf::Glsl::Vec4(pixel_dx, pixel_dy, TEXTURE_WIDTH, TEXTURE_HEIGHT));
+    shader.setUniform("previous_state_position", sf::Glsl::Vec4(texture_pixel_offset_x,
+                                                                texture_pixel_offset_y,
+                                                                TEXTURE_WIDTH, TEXTURE_HEIGHT));
     if (previous_state_flag) shader.setUniform("previous_state", previous_state);
     
     update_texture();
@@ -107,6 +123,10 @@ void MandelbrotViewer::decrease_limit() {
         shader.setUniform("limit", limit);
     }
     
+    update_texture();
+}
+
+void MandelbrotViewer::refresh() {
     update_texture();
 }
 
