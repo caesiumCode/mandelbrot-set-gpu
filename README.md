@@ -11,5 +11,5 @@ The features that should be implemented:
   * [x] Use an algebraic trick to minimize the number of multiplications  in the while loop (3 instead of 5)
 * **Perturbation Theory**
   * [ ] Use Perturbation Theory rather than Escape Time algorithm when a reference point is given
-  * [ ] Find a reference point automatically
+  * [ ] Use gradient descent on an approximation of the distance function to find a reference point
   * [ ] Use binary search with a power series approximation in order to find the iteration for which it diverges
