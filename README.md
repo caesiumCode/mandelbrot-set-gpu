@@ -1,5 +1,5 @@
 # mandelbrot-set-gpu
-This is a Mandelbrot Set viewer implemented in C++ with [SFML](https://www.sfml-dev.org/). Here I list all the features of the application:
+This is a Mandelbrot Set viewer implemented in C++ with [SFML](https://www.sfml-dev.org/). Here I list all the features that will be present:
 * **Viewer Modes**
   * [x] Default mode: Color according to the divergence speed
   * [ ] Data mode:
