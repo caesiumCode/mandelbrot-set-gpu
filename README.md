@@ -12,7 +12,7 @@ This is a Mandelbrot Set viewer implemented in C++ with [SFML](https://www.sfml-
 * **Rendering**
   * [x] Use a shader to process each pixel in parallel
   * [ ] Use the previous image to skip computation when:
-    * [ ] the offset is changing
+    * [x] the offset is changing
     * [ ] the limit is changing
     * [ ] the scale is changing
 * **Escape time algorithm**
