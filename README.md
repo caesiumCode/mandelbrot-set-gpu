@@ -1,11 +1,12 @@
 # mandelbrot-set-gpu
-This is a Mandelbrot Set viewer implemented in C++ with [SFML](https://www.sfml-dev.org/). Here I list all the features of this application:
+This is a Mandelbrot Set viewer implemented in C++ with [SFML](https://www.sfml-dev.org/). Here I list all the features of the application:
 * **Viewer Modes**
   * [x] Default mode: Color according to the divergence speed
   * [ ] Data mode:
     * Display the values of some relevant parameters
     * Draw the reference point
   * [ ] Debug mode:
+    * Color according to the distance to the Mandelbrot Set
     * Highlight parts of the image that used a rendering optimisation
     * Draw the path used in order to find the reference point
 * **Rendering**
