@@ -1,11 +1,19 @@
 # mandelbrot-set-gpu
-This is a Mandelbrot Set viewer. 
-
-The features that should be implemented:
+This is a Mandelbrot Set viewer implemented in C++ with [SFML](https://www.sfml-dev.org/). Here I list all the features of this application:
+* **Viewer Modes**
+  * [x] Default mode: Color according to the divergence speed
+  * [ ] Data mode:
+    * Display the values of some relevant parameters
+    * Draw the reference point
+  * [ ] Debug mode:
+    * Highlight parts of the image that used a rendering optimisation
+    * Draw the path used in order to find the reference point
 * **Rendering**
   * [x] Use a shader to process each pixel in parallel
-  * [x] Use previous image to skip computation when only the offset is changing
-  * [ ] Use previous image to skip computation when only the limit is changing
+  * [ ] Use the previous image to skip computation when:
+    * [ ] the offset is changing
+    * [ ] the limit is changing
+    * [ ] the scale is changing
 * **Escape time algorithm**
   * [x] Check if a a pixel lies within the cardioid or the period-2 bulb in order to skip computation
   * [x] Use an algebraic trick to minimize the number of multiplications  in the while loop (3 instead of 5)
