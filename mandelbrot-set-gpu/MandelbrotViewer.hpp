@@ -12,6 +12,8 @@
 #include <cmath>
 #include <iostream>
 
+#include "sfmath.hpp"
+
 namespace mv {
 using value_gradient = std::pair<float, sf::Vector2f>;
 

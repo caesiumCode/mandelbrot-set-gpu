@@ -236,39 +236,37 @@ void mv::RenderMandelbrot::find_reference_point() {
 mv::value_gradient mv::RenderMandelbrot::distance_estimation(sf::Vector2f c) {
     // Derivatives are in respect to c
     
-    sf::Vector2f z = sf::Vector2f(0.f, 0.f);    // z
-    sf::Vector2f dz = sf::Vector2f(0.f, 0.f);   // z'
+    sf::Vector2f z = sf::math::zero;    // z
+    sf::Vector2f dz = sf::math::zero;   // z'
     
-    sf::Vector2f gx = sf::Vector2f(0.f, 0.f);   // gradient of Re(z)
-    sf::Vector2f gy = sf::Vector2f(0.f, 0.f);   // gradient of Im(z)
+    sf::Vector2f gx = sf::math::zero;   // gradient of Re(z)
+    sf::Vector2f gy = sf::math::zero;   // gradient of Im(z)
     
-    sf::Vector2f gdx = sf::Vector2f(0.f, 0.f);  // gradient of Re(z')
-    sf::Vector2f gdy = sf::Vector2f(0.f, 0.f);  // gradient of Im(z')
+    sf::Vector2f gdx = sf::math::zero;  // gradient of Re(z')
+    sf::Vector2f gdy = sf::math::zero;  // gradient of Im(z')
     
     int n = 0;
-    while (z.x*z.x + z.y*z.y <= 1.0e+10 && n < limit) {
+    while (sf::math::dot(z,z) <= 1.0e+10 && n < limit) {
         sf::Vector2f temp_gx = gx;
         sf::Vector2f temp_gdx = gdx;
         
-        gdx = sf::Vector2f(2.f*dz.x*gx.x - 2.f*dz.y*gy.x + 2.f*z.x*gdx.x - 2.f*z.y*gdy.x,
-                           2.f*dz.x*gx.y - 2.f*dz.y*gy.y + 2.f*z.x*gdx.y - 2.f*z.y*gdy.y);
-        gdy = sf::Vector2f(2.f*dz.x*gy.x + 2.f*dz.y*gx.x + 2.f*z.x*gdy.x + 2.f*z.y*temp_gdx.x,
-                           2.f*dz.x*gy.y + 2.f*dz.y*gx.y + 2.f*z.x*gdy.y + 2.f*z.y*temp_gdx.y);
+        gdx = 2.f*dz.x*gx - 2.f*dz.y*gy + 2.f*z.x*gdx - 2.f*z.y*gdy;
+        gdy = 2.f*dz.x*gy + 2.f*dz.y*gx + 2.f*z.x*gdy + 2.f*z.y*temp_gdx;
         
-        gx = sf::Vector2f(2.f*z.x*gx.x - 2.f*z.y*gy.x + 1.f, 2.f*z.x*gx.y - 2.f*z.y*gy.y);
-        gy = sf::Vector2f(2.f*z.x*gy.x + 2.f*z.y*temp_gx.x, 2.f*z.x*gy.y + 2.f*z.y*temp_gx.y + 1.f);
+        gx = 2.f*z.x*gx - 2.f*z.y*gy        + sf::math::real_unit;
+        gy = 2.f*z.x*gy + 2.f*z.y*temp_gx   + sf::math::imag_unit;
         
-        dz = sf::Vector2f(2.f*z.x*dz.x - 2.f*z.y*dz.y + 1.f, 2.f*z.x*dz.y + 2.f*z.y*dz.x);
+        dz = 2.f * sf::math::cmul(z, dz)    + sf::math::real_unit;
         
-        z = sf::Vector2f(z.x*z.x - z.y*z.y + c.x, 2.f*z.x*z.y + c.y);
+        z = sf::math::cmul(z, z) + c;
         
         n++;
     }
     
     if (n == limit) {
-        return {0.f, sf::Vector2f(0.f, 0.f)};
+        return {0.f, sf::math::zero};
     } else {
-        float norm2 = z.x*z.x + z.y*z.y, dnorm2 = dz.x*dz.x + dz.y*dz.y;
+        float norm2 = sf::math::dot(z,z), dnorm2 = sf::math::dot(dz,dz);
         float norm = sqrt(norm2), dnorm = sqrt(dnorm2);
         float log_norm = log(norm);
         
@@ -276,7 +274,7 @@ mv::value_gradient mv::RenderMandelbrot::distance_estimation(sf::Vector2f c) {
         
         sf::Vector2f gradient = (1.f + log_norm)/(norm*dnorm)*(z.x*gx + z.y*gy) - distance/dnorm2*(dz.x*gdx + dz.y*gdy);
         
-        return {distance, -gradient/sqrt(gradient.x*gradient.x + gradient.y*gradient.y)};
+        return {distance, -gradient/sf::math::norm(gradient)};
     }
 }
 
