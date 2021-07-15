@@ -1,3 +1,6 @@
+uniform int mode;   // 0: Default
+                    // 1: Debug
+
 uniform vec2 resolution; // Resoltion of the texture
 uniform vec3 zoom; // Zoom parameters (coordinates of the center, scale factor)
 uniform int limit; // Maximum number of iteration of the sequence
@@ -8,7 +11,7 @@ uniform bool previous_state_flag; // true if we use the previous state, false ot
 
 
 // Return the number of iteration of the sequence before it escapes the "magnitude 2 border"
-int isInMandelbrotSet(vec2 c) {
+int escapeTime(vec2 c) {
     // Simple geometry optimization
     // Check if c is in the main cardioid/bulb
     float d_cx = c.x - 0.25;
@@ -35,12 +38,44 @@ int isInMandelbrotSet(vec2 c) {
     return n;
 }
 
+// Return an estimation of the distance between the input and the mandelbrot set
+float distanceEstimation(vec2 c) {
+    int n = 0;
+    vec2 z = vec2(0.0);
+    vec2 dz = vec2(1.0, 0.0);
+    
+    while (dot(z,z) <= 1.0e+10 && n < limit) {
+        dz = vec2(2.0*(z.x*dz.x - z.y*dz.y) + 1.0, 2.0*(z.x*dz.y + z.y*dz.x));
+        z = vec2(z.x*z.x - z.y*z.y + c.x, 2.0*z.x*z.y + c.y);
+        
+        n++;
+    }
+    
+    if (dot(z,z) <= 4.0)
+        return 0.0;
+    else {
+        float norm2 = dot(z,z), dnorm2 = dot(dz,dz);
+        float norm = sqrt(norm2), dnorm = sqrt(dnorm2);
+        return norm*log(norm)/dnorm;
+    }
+}
+
 // Convert the number of iteration to a color
-vec3 toColor(int n) {
+vec3 speedToColor(int n) {
     if (n >= limit)
         return vec3(0.0);
     else
         return 0.5 + 0.5*cos(10.0*sqrt(float(n)/float(limit)) + vec3(3.0, 3.5, 4.0));
+}
+
+
+
+// Convert a distance to the Mandelbrot set into a color
+vec3 distanceToColor(float d) {
+    if (d == 0.0)
+        return vec3(0.0);
+    else
+        return 0.5 + 0.5*cos(10.0*pow(d/zoom.z, 0.2) + vec3(-0.5, 0.0, 0.5));
 }
 
 // Return true if the current pixel can also be found in the previous state
@@ -62,14 +97,25 @@ void main( void ) {
                                   resolution.y - (gl_FragCoord.y-previous_state_position.y));
         
         color = texture2D(previous_state, texture_coord/resolution).xyz;
+        
+        if (mode == 1)
+            color.x = 0.0;
     }
     // Calculate the color from scratch
     else {
         // Map the coordinates of pixels into a normalized space such that -0.5 < x < 0.5
         vec2 normalized_coord = gl_FragCoord.xy/resolution.x - vec2(0.5, 0.5*resolution.y/resolution.x);
+        vec2 complex_coord = zoom.xy + zoom.z * normalized_coord;
         
-        int iter = isInMandelbrotSet(zoom.xy + zoom.z * normalized_coord);
-        color = toColor(iter);
+        if (mode == 0) {
+            int iter = escapeTime(complex_coord);
+            
+            color = speedToColor(iter);
+        } else if (mode == 1) {
+            float dist = distanceEstimation(complex_coord);
+            
+            color = distanceToColor(dist);
+        }
     }
     
     // Output

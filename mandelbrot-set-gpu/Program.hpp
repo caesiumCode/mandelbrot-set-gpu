@@ -33,13 +33,21 @@ private:
     sf::Vector2i mouse_previous_position;
     bool mouse_flag;
     
-    MandelbrotViewer mandelbrotViewer;
+    // Mandelbrot Set related variables
+    mv::RenderMandelbrot renderMandelbrot;
     
+    // Get the right window title
+    std::string getTitle(mv::ViewerMode);
+    
+    // Drawing methods
+    void drawDefaultMode();
+    void drawDebugMode();
     
     // Event related methods
     void handleEvent(const sf::Event&);
     
     void exitEvent(const sf::Event&);
+    void modeEvent(const sf::Event&);
     void scaleEvent(const sf::Event&);
     void offsetEvent(const sf::Event&);
     void limitEvent(const sf::Event&);
