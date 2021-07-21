@@ -78,7 +78,12 @@ vec3 computeColor(vec2 coord) {
     vec2 complex_coord = zoom.xy + zoom.z * normalized_coord;
     
     int iter = escapeTime(complex_coord);
-    return speedToColor(iter);
+    vec3 color = speedToColor(iter);
+    
+    if (mode == 1)
+        color.z = 1.0; // add blue
+    
+    return color;
 }
 
 // Main function of the shader
@@ -94,8 +99,6 @@ void main( void ) {
         
         if (factor < 1.0 && checkColorGradient(texture_coord)) {
             color = computeColor(gl_FragCoord.xy);
-            if (mode == 1)
-                color.x = 1.0; // add red
         } else {
             color = texture2D(previous_state, texture_coord/resolution).xyz;
             if (mode == 1)
@@ -103,8 +106,6 @@ void main( void ) {
         }
     } else {
         color = computeColor(gl_FragCoord.xy);
-        if (mode == 1)
-            color.z = 1.0; // add blue
     }
     
     // Output
