@@ -103,7 +103,11 @@ void Program::scaleEvent(const sf::Event & event) {
         
         float update_factor = exp(-0.1*mouse_parameters.delta);
         
-        renderMandelbrot.update_scale(update_factor);
+        if (mouse_parameters.delta != 0.f) {
+            renderMandelbrot.set_previous_state_optimization(true);
+            renderMandelbrot.update_scale(update_factor);
+            renderMandelbrot.set_previous_state_optimization(false);
+        }
     }
 }
 

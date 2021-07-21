@@ -1,6 +1,9 @@
 uniform int mode;   // 0: Default
                     // 1: Debug
 
+uniform int nb_directions; // Number of directions
+uniform vec2 directions[8]; // Directions for seacrhing a color gradient
+
 uniform vec2 resolution; // Resoltion of the texture
 uniform vec3 zoom; // Zoom parameters (coordinates of the center, scale factor)
 uniform int limit; // Maximum number of iteration of the sequence
@@ -38,44 +41,12 @@ int escapeTime(vec2 c) {
     return n;
 }
 
-// Return an estimation of the distance between the input and the mandelbrot set
-float distanceEstimation(vec2 c) {
-    int n = 0;
-    vec2 z = vec2(0.0);
-    vec2 dz = vec2(1.0, 0.0);
-    
-    while (dot(z,z) <= 1.0e+10 && n < limit) {
-        dz = vec2(2.0*(z.x*dz.x - z.y*dz.y) + 1.0, 2.0*(z.x*dz.y + z.y*dz.x));
-        z = vec2(z.x*z.x - z.y*z.y + c.x, 2.0*z.x*z.y + c.y);
-        
-        n++;
-    }
-    
-    if (dot(z,z) <= 4.0)
-        return 0.0;
-    else {
-        float norm2 = dot(z,z), dnorm2 = dot(dz,dz);
-        float norm = sqrt(norm2), dnorm = sqrt(dnorm2);
-        return norm*log(norm)/dnorm;
-    }
-}
-
 // Convert the number of iteration to a color
 vec3 speedToColor(int n) {
     if (n >= limit)
         return vec3(0.0);
     else
         return 0.5 + 0.5*cos(10.0*sqrt(float(n)/float(limit)) + vec3(3.0, 3.5, 4.0));
-}
-
-
-
-// Convert a distance to the Mandelbrot set into a color
-vec3 distanceToColor(float d) {
-    if (d == 0.0)
-        return vec3(0.0);
-    else
-        return 0.5 + 0.5*cos(10.0*pow(d/zoom.z, 0.2) + vec3(-0.5, 0.0, 0.5));
 }
 
 // Return true if the current pixel can also be found in the previous state
@@ -86,6 +57,30 @@ bool isInPreviousTexture(vec2 coord) {
             coord.y < previous_state_position.y + previous_state_position.w;
 }
 
+// Return true if there is a color gradient
+bool checkColorGradient(vec2 coord) {
+    vec4 reference_color = texture2D(previous_state, coord/resolution);
+    
+    for (int i = 0; i < nb_directions; i++) {
+        if ((coord + directions[i]).x >= 0.0 && (coord + directions[i]).x < resolution.x &&
+            (coord + directions[i]).y >= 0.0 && (coord + directions[i]).y < resolution.y)
+            if (texture2D(previous_state, (coord + directions[i])/resolution) != reference_color)
+                return true;
+    }
+    
+    return false;
+}
+
+// Return the color of a pixel by iterating a complex sequence
+vec3 computeColor(vec2 coord) {
+    // Map the coordinates of pixels into a normalized space such that -0.5 < x < 0.5
+    vec2 normalized_coord = coord/resolution.x - vec2(0.5, 0.5*resolution.y/resolution.x);
+    vec2 complex_coord = zoom.xy + zoom.z * normalized_coord;
+    
+    int iter = escapeTime(complex_coord);
+    return speedToColor(iter);
+}
+
 // Main function of the shader
 void main( void ) {
     vec3 color = vec3(0.0);
@@ -93,29 +88,23 @@ void main( void ) {
     // Previous state optimization
     if (previous_state_flag && isInPreviousTexture(gl_FragCoord.xy)) {
         
-        vec2 texture_coord = vec2(gl_FragCoord.x-previous_state_position.x,
-                                  resolution.y - (gl_FragCoord.y-previous_state_position.y));
+        float factor = resolution.x / previous_state_position.z;
+        vec2 texture_coord = vec2(factor * (gl_FragCoord.x - previous_state_position.x),
+                                  resolution.y - factor * (gl_FragCoord.y - previous_state_position.y));
         
-        color = texture2D(previous_state, texture_coord/resolution).xyz;
-        
-        if (mode == 1)
-            color.x = 0.0;
-    }
-    // Calculate the color from scratch
-    else {
-        // Map the coordinates of pixels into a normalized space such that -0.5 < x < 0.5
-        vec2 normalized_coord = gl_FragCoord.xy/resolution.x - vec2(0.5, 0.5*resolution.y/resolution.x);
-        vec2 complex_coord = zoom.xy + zoom.z * normalized_coord;
-        
-        if (mode == 0) {
-            int iter = escapeTime(complex_coord);
-            
-            color = speedToColor(iter);
-        } else if (mode == 1) {
-            float dist = distanceEstimation(complex_coord);
-            
-            color = distanceToColor(dist);
+        if (factor < 1.0 && checkColorGradient(texture_coord)) {
+            color = computeColor(gl_FragCoord.xy);
+            if (mode == 1)
+                color.x = 1.0; // add red
+        } else {
+            color = texture2D(previous_state, texture_coord/resolution).xyz;
+            if (mode == 1)
+                color.y = 1.0; // add green
         }
+    } else {
+        color = computeColor(gl_FragCoord.xy);
+        if (mode == 1)
+            color.z = 1.0; // add blue
     }
     
     // Output

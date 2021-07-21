@@ -75,6 +75,7 @@ private:
     // Private methods
     void draw_default(sf::RenderWindow &);
     void draw_debug(sf::RenderWindow &);
+    void debug_refresh();
     
     
     void find_reference_point();
