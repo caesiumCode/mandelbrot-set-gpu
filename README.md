@@ -6,7 +6,6 @@ This is a Mandelbrot Set viewer implemented in C++ with [SFML](https://www.sfml-
     * Display the values of some relevant parameters
     * Draw the reference point
   * [x] Debug mode:
-    * Color according to the distance to the Mandelbrot Set
     * Highlight parts of the image that used a rendering optimisation
     * Draw the path used in order to find the reference point
 * **Rendering**
@@ -14,7 +13,7 @@ This is a Mandelbrot Set viewer implemented in C++ with [SFML](https://www.sfml-
   * [ ] Use the previous image to skip computation when:
     * [x] the offset is changing
     * [ ] the limit is changing
-    * [ ] the scale is changing
+    * [x] the scale is changing
 * **Escape time algorithm**
   * [x] Check if a a pixel lies within the cardioid or the period-2 bulb in order to skip computation
   * [x] Use an algebraic trick to minimize the number of multiplications  in the while loop (3 instead of 5)
