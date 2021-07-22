@@ -26,7 +26,6 @@ mv::RenderMandelbrot::RenderMandelbrot() {
     
     // Rendering variables
     texture.create(TEXTURE_WIDTH, TEXTURE_HEIGHT);
-    
     previous_state.create(TEXTURE_WIDTH, TEXTURE_HEIGHT);
     
     shader.loadFromFile("mandelbrot.frag", sf::Shader::Fragment);
@@ -36,7 +35,6 @@ mv::RenderMandelbrot::RenderMandelbrot() {
     shader.setUniform("previous_state", previous_state);
     shader.setUniform("previous_state_position", sf::Glsl::Vec4(0, 0, TEXTURE_WIDTH, TEXTURE_HEIGHT));
     shader.setUniform("previous_state_flag", previous_state_flag);
-    shader.setUniform("mode", mode);
     
     sf::Glsl::Vec2 directions[8];
     directions[0] = sf::Glsl::Vec2(-1.0,   0.0);
@@ -83,14 +81,11 @@ void mv::RenderMandelbrot::set_previous_state_optimization(bool flag) {
 
 void mv::RenderMandelbrot::set_mode(ViewerMode m) {
     mode = m;
-    shader.setUniform("mode", mode);
     
     refresh();
 }
 
 void mv::RenderMandelbrot::update_offset(int pixel_dx, int pixel_dy) {
-    debug_refresh();
-    
     buffer_pixel_offset_x += pixel_dx;
     buffer_pixel_offset_y += pixel_dy;
     
@@ -114,14 +109,11 @@ void mv::RenderMandelbrot::update_offset(int pixel_dx, int pixel_dy) {
     shader.setUniform("previous_state_position", sf::Glsl::Vec4(texture_pixel_offset_x,
                                                                 texture_pixel_offset_y,
                                                                 TEXTURE_WIDTH, TEXTURE_HEIGHT));
-    if (previous_state_flag) shader.setUniform("previous_state", previous_state);
     
     refresh();
 }
 
 void mv::RenderMandelbrot::update_scale(float factor) {
-    debug_refresh();
-    
     scale *= factor;
     shader.setUniform("zoom", sf::Glsl::Vec3(offset_x, offset_y, scale));
     shader.setUniform("previous_state_position", sf::Glsl::Vec4((float) (1.f - 1.f/factor) * TEXTURE_WIDTH / 2.f,
@@ -166,19 +158,12 @@ void mv::RenderMandelbrot::refresh() {
     
     // Save previous state
     previous_state.update(texture.getTexture());
+    shader.setUniform("previous_state", previous_state);
     
     // Update texture
     texture.clear();
     texture.draw(sprite, &shader);
     texture.display();
-}
-
-void mv::RenderMandelbrot::debug_refresh() {
-    if (mode == mv::ViewerMode::Debug) {
-        shader.setUniform("previous_state_flag", mv::ViewerMode::Default);
-        refresh();
-        shader.setUniform("previous_state_flag", mv::ViewerMode::Debug);
-    }
 }
 
 

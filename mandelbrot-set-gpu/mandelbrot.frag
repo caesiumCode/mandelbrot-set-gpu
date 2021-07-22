@@ -1,10 +1,7 @@
-uniform int mode;   // 0: Default
-                    // 1: Debug
-
 uniform int nb_directions; // Number of directions
 uniform vec2 directions[8]; // Directions for seacrhing a color gradient
 
-uniform vec2 resolution; // Resoltion of the texture
+uniform vec2 resolution; // Resolution of the texture
 uniform vec3 zoom; // Zoom parameters (coordinates of the center, scale factor)
 uniform int limit; // Maximum number of iteration of the sequence
 
@@ -80,9 +77,6 @@ vec3 computeColor(vec2 coord) {
     int iter = escapeTime(complex_coord);
     vec3 color = speedToColor(iter);
     
-    if (mode == 1)
-        color.z = 1.0; // add blue
-    
     return color;
 }
 
@@ -101,8 +95,6 @@ void main( void ) {
             color = computeColor(gl_FragCoord.xy);
         } else {
             color = texture2D(previous_state, texture_coord/resolution).xyz;
-            if (mode == 1)
-                color.y = 1.0; // add green
         }
     } else {
         color = computeColor(gl_FragCoord.xy);
