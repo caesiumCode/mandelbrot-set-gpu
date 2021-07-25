@@ -15,12 +15,12 @@ WINDOW_HEIGHT(height)
     cursor.loadFromSystem(sf::Cursor::Arrow);
     
     // Setup window
-    window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE + " [default]");
+    window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), getTitle(renderMandelbrot.getViewerMode()));
     window.setFramerateLimit(30);
     window.setMouseCursor(cursor);
     
     // Setup variables
-    renderMandelbrot.set_rendering_settings(WINDOW_WIDTH, WINDOW_HEIGHT);
+    renderMandelbrot.setWindowDimensions(WINDOW_WIDTH, WINDOW_HEIGHT);
     
     mouse_flag = false;
 }
@@ -81,12 +81,12 @@ void Program::modeEvent(const sf::Event & event) {
         
         switch (event.key.code) {
             case sf::Keyboard::Q:
-                renderMandelbrot.set_mode(mv::ViewerMode::Default);
+                renderMandelbrot.setMode(mv::ViewerMode::Default);
                 window.setTitle(getTitle(mv::ViewerMode::Default));
                 break;
                 
             case sf::Keyboard::S:
-                renderMandelbrot.set_mode(mv::ViewerMode::Debug);
+                renderMandelbrot.setMode(mv::ViewerMode::Debug);
                 window.setTitle(getTitle(mv::ViewerMode::Debug));
                 break;
                 
@@ -104,9 +104,7 @@ void Program::scaleEvent(const sf::Event & event) {
         float update_factor = exp(-0.1*mouse_parameters.delta);
         
         if (mouse_parameters.delta != 0.f) {
-            renderMandelbrot.set_previous_state_optimization(true);
             renderMandelbrot.update_scale(update_factor);
-            renderMandelbrot.set_previous_state_optimization(false);
         }
     }
 }
@@ -119,14 +117,14 @@ void Program::offsetEvent(const sf::Event & event) {
         mouse_previous_position = sf::Mouse::getPosition();
         
         mouse_flag = true;
-        
-        renderMandelbrot.set_previous_state_optimization(true);
     }
     
     if (mouse_flag) {
         sf::Vector2i mouse_offset = sf::Mouse::getPosition() - mouse_previous_position;
         
-        renderMandelbrot.update_offset(mouse_offset.x, -mouse_offset.y);
+        mouse_offset.y = - mouse_offset.y;
+        
+        renderMandelbrot.update_center(mouse_offset);
         
         mouse_previous_position = sf::Mouse::getPosition();
     }
@@ -136,8 +134,6 @@ void Program::offsetEvent(const sf::Event & event) {
         window.setMouseCursor(cursor);
         
         mouse_flag = false;
-        
-        renderMandelbrot.set_previous_state_optimization(false);
     }
 }
 

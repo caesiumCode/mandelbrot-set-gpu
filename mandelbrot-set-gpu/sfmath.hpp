@@ -14,6 +14,9 @@
 namespace sf {
 namespace math {
 
+
+using value_gradient = std::pair<float, sf::Vector2f>;
+
 // constants
 const sf::Vector2f real_unit = sf::Vector2f(1.f, 0.f);
 const sf::Vector2f imag_unit = sf::Vector2f(0.f, 1.f);

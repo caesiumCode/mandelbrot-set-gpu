@@ -5,7 +5,7 @@ uniform vec2 resolution; // Resolution of the texture
 uniform vec3 zoom; // Zoom parameters (coordinates of the center, scale factor)
 uniform int limit; // Maximum number of iteration of the sequence
 
-uniform sampler2D previous_state; // Texture previously computed
+uniform sampler2D previous_state_texture; // Texture previously computed
 uniform vec4 previous_state_position; // Position of the previous texture relative to the current one
 uniform bool previous_state_flag; // true if we use the previous state, false otherwise
 
@@ -56,12 +56,12 @@ bool isInPreviousTexture(vec2 coord) {
 
 // Return true if there is a color gradient
 bool checkColorGradient(vec2 coord) {
-    vec4 reference_color = texture2D(previous_state, coord/resolution);
+    vec4 reference_color = texture2D(previous_state_texture, coord/resolution);
     
     for (int i = 0; i < nb_directions; i++) {
         if ((coord + directions[i]).x >= 0.0 && (coord + directions[i]).x < resolution.x &&
             (coord + directions[i]).y >= 0.0 && (coord + directions[i]).y < resolution.y)
-            if (texture2D(previous_state, (coord + directions[i])/resolution) != reference_color)
+            if (texture2D(previous_state_texture, (coord + directions[i])/resolution) != reference_color)
                 return true;
     }
     
@@ -94,7 +94,7 @@ void main( void ) {
         if (factor < 1.0 && checkColorGradient(texture_coord)) {
             color = computeColor(gl_FragCoord.xy);
         } else {
-            color = texture2D(previous_state, texture_coord/resolution).xyz;
+            color = texture2D(previous_state_texture, texture_coord/resolution).xyz;
         }
     } else {
         color = computeColor(gl_FragCoord.xy);
