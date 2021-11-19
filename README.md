@@ -1,8 +1,27 @@
 # mandelbrot-set-gpu
-This is a Mandelbrot Set viewer implemented in C++ with [SFML](https://www.sfml-dev.org/). Here I list all the features that will be present:
+This is a Mandelbrot Set viewer implemented in C++ with [SFML](https://www.sfml-dev.org/). 
+
+![](https://github.com/caesiumCode/mandelbrot-set-gpu/blob/main/examples/mandelbrot-set%5Bdefault%5D%5B0.000000:0.000000:5.000000%5D%5B103%5D.png)
+![](https://github.com/caesiumCode/mandelbrot-set-gpu/blob/main/examples/mandelbrot-set%5Bdefault%5D%5B-1.280496:0.064806:0.007079%5D%5B1890%5D.png)
+
+
+
+You can easily interact with the viewer using the following inputs
+
+| Input | Action |
+| ----- | ----- |
+| Up | Increase the limit |
+| Down | Decrease the limit |
+| Left Buttun + Mouse | Move inside the image |
+| Mouse wheel | Zoom/Dezoom inside the image |
+| Q | Default mode |
+| S | Default mode |
+
+
+Here is a list of all the features/optimizations that is planned:
 * **Viewer Modes**
   * [x] Default mode: Color according to the divergence speed
-  * [ ] Data overlay:
+  * [x] Data overlay:
     * Display the values of some relevant parameters
     * Draw the reference point
   * [x] Debug mode:
