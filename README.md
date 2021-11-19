@@ -1,8 +1,8 @@
 # mandelbrot-set-gpu
 This is a Mandelbrot Set viewer implemented in C++ with [SFML](https://www.sfml-dev.org/). 
 
-![](https://github.com/caesiumCode/mandelbrot-set-gpu/blob/main/examples/mandelbrot-set%5Bdefault%5D%5B0.000000:0.000000:5.000000%5D%5B103%5D.png)
-![](https://github.com/caesiumCode/mandelbrot-set-gpu/blob/main/examples/mandelbrot-set%5Bdefault%5D%5B-1.280496:0.064806:0.007079%5D%5B1890%5D.png)
+![](https://github.com/caesiumCode/mandelbrot-set-gpu/blob/main/examples/mandelbrot-set%5Bdefault%5D%5B0.000000:0.000000:5.000000%5D%5B100%5D.png)
+![](https://github.com/caesiumCode/mandelbrot-set-gpu/blob/main/examples/mandelbrot-set%5Bdefault%5D%5B0.337789:0.510188:0.005795%5D%5B1955%5D.png)
 
 
 
@@ -29,6 +29,7 @@ Here is a list of all the features/optimizations that is planned:
     * Draw the path used in order to find the reference point
 * **Rendering**
   * [x] Use a shader to process each pixel in parallel
+  * [x] Use linear interpolation between the last two iterations for continuous color gradient
   * [ ] Use the previous image to skip computation when:
     * [x] the offset is changing
     * [ ] the limit is changing
