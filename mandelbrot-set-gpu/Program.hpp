@@ -9,10 +9,13 @@
 #define Program_hpp
 
 #include <iostream>
+#include <filesystem>
 #include <cmath>
 #include <SFML/Graphics.hpp>
 
 #include "MandelbrotViewer.hpp"
+
+namespace fs = std::__fs::filesystem;
 
 class Program {
 public:
@@ -22,6 +25,7 @@ public:
     
 private:
     // Constants
+    const std::string   PATH = fs::current_path().string();
     const std::string   WINDOW_TITLE = "Mandelbrot Set with GPU";
     const unsigned      WINDOW_WIDTH, WINDOW_HEIGHT;
     
@@ -37,7 +41,7 @@ private:
     mv::RenderMandelbrot renderMandelbrot;
     
     // Get the right window title
-    std::string getTitle(mv::ViewerMode);
+    void updateTitle();
     
     // Drawing methods
     void drawDefaultMode();
@@ -51,6 +55,7 @@ private:
     void scaleEvent(const sf::Event&);
     void offsetEvent(const sf::Event&);
     void limitEvent(const sf::Event&);
+    void screenshotEvent(const sf::Event&);    
 };
 
 #endif /* Program_hpp */

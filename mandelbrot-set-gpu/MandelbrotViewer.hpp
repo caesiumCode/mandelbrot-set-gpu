@@ -39,6 +39,8 @@ public:
     void decrease_limit();
     
     ViewerMode getViewerMode();
+    sf::Vector3f getLocalisation();
+    int getLimit();
     
     void refresh();
     

@@ -152,6 +152,14 @@ mv::ViewerMode mv::RenderMandelbrot::getViewerMode() {
     return mode;
 }
 
+sf::Vector3f mv::RenderMandelbrot::getLocalisation() {
+    return sf::Vector3f(offset_x, offset_y, scale);
+}
+
+int mv::RenderMandelbrot::getLimit() {
+    return limit;
+}
+
 void mv::RenderMandelbrot::refresh() {
     // Find reference point
     find_reference_point();

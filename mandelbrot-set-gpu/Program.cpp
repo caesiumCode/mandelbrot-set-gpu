@@ -15,12 +15,13 @@ WINDOW_HEIGHT(height)
     cursor.loadFromSystem(sf::Cursor::Arrow);
     
     // Setup window
-    window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE + " [default]");
+    window.create(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), WINDOW_TITLE);
     window.setFramerateLimit(30);
     window.setMouseCursor(cursor);
     
     // Setup variables
     renderMandelbrot.set_rendering_settings(WINDOW_WIDTH, WINDOW_HEIGHT);
+    updateTitle();
     
     mouse_flag = false;
 }
@@ -66,9 +67,12 @@ void Program::handleEvent(const sf::Event& event) {
     scaleEvent(event);
     offsetEvent(event);
     limitEvent(event);
+    screenshotEvent(event);
     
-    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Return)
+    if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::BackSlash)
         renderMandelbrot.refresh();
+    
+    updateTitle();
 }
 
 void Program::exitEvent(const sf::Event & event) {
@@ -82,12 +86,10 @@ void Program::modeEvent(const sf::Event & event) {
         switch (event.key.code) {
             case sf::Keyboard::Q:
                 renderMandelbrot.set_mode(mv::ViewerMode::Default);
-                window.setTitle(getTitle(mv::ViewerMode::Default));
                 break;
                 
             case sf::Keyboard::S:
                 renderMandelbrot.set_mode(mv::ViewerMode::Debug);
-                window.setTitle(getTitle(mv::ViewerMode::Debug));
                 break;
                 
             default:
@@ -144,24 +146,53 @@ void Program::offsetEvent(const sf::Event & event) {
 void Program::limitEvent(const sf::Event & event) {
     if (event.type == sf::Event::KeyPressed) {
         
-        if      (event.key.code == sf::Keyboard::A) renderMandelbrot.increase_limit();
-        else if (event.key.code == sf::Keyboard::Z) renderMandelbrot.decrease_limit();
+        if      (event.key.code == sf::Keyboard::Up)    renderMandelbrot.increase_limit();
+        else if (event.key.code == sf::Keyboard::Down)  renderMandelbrot.decrease_limit();
+    }
+}
+
+void Program::screenshotEvent(const sf::Event& event) {
+    if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Return) {
         
+        std::string filename = "mandelbrot-set";
+        if (renderMandelbrot.getViewerMode() == mv::ViewerMode::Default)
+            filename += "[default]";
+        else
+            filename += "[debug]";
+        
+        sf::Vector3f loc = renderMandelbrot.getLocalisation();
+        int limit = renderMandelbrot.getLimit();
+        
+        filename += "[" + std::to_string(loc.x) + ":" + std::to_string(loc.y) + ":" + std::to_string(loc.z) + "]";
+        filename += "[" + std::to_string(limit) + "]";
+        filename += ".png";
+        
+        std::string filepath = PATH + "/" + filename;
+        
+        sf::Texture texture;
+        texture.create(window.getSize().x, window.getSize().y);
+        texture.update(window);
+        if (texture.copyToImage().saveToFile(filepath))
+        {
+            std::cout << "screenshot saved to " << filepath << std::endl;
+        }
     }
 }
 
 
-std::string Program::getTitle(mv::ViewerMode mode) {
-    switch (mode) {
-        case mv::ViewerMode::Default:
-            return WINDOW_TITLE + " [Default]";
-            break;
-            
-        case mv::ViewerMode::Debug:
-            return WINDOW_TITLE + " [Debug]";
-            break;
-            
-        default:
-            break;
-    }
+void Program::updateTitle() {
+    std::string title = WINDOW_TITLE + " ";
+    
+    if (renderMandelbrot.getViewerMode() == mv::ViewerMode::Default)
+        title += "[default]";
+    else
+        title += "[debug]";
+    
+    sf::Vector3f loc = renderMandelbrot.getLocalisation();
+    int limit = renderMandelbrot.getLimit();
+    
+    title += "[" + std::to_string(loc.x) + ":" + std::to_string(loc.y) + ":" + std::to_string(loc.z) + "]";
+    title += "[" + std::to_string(limit) + "]";
+    
+    window.setTitle(title);
 }
