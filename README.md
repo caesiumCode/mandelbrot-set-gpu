@@ -12,10 +12,10 @@ You can easily interact with the viewer using the following inputs
 | ----- | ----- |
 | Up | Increase the limit |
 | Down | Decrease the limit |
-| Left Buttun + Mouse | Move inside the image |
+| Left Button + Mouse | Move inside the image |
 | Mouse wheel | Zoom/Dezoom inside the image |
 | Q | Default mode |
-| S | Default mode |
+| S | Debug mode |
 
 
 Here is a list of all the features/optimizations that is planned:
